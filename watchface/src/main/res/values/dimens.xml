@@ -3,29 +3,41 @@
     <dimen name="digital_text_size">40dp</dimen>
     <dimen name="digital_text_size_round">45dp</dimen>
     <dimen name="digital_x_offset">40dp</dimen>
-    <dimen name="digital_x_offset_round">25dp</dimen>
-    <dimen name="digital_y_offset">70dp</dimen>
+    <dimen name="digital_x_offset_round">50dp</dimen>
+    <dimen name="digital_y_offset">80dp</dimen>
 
-    <!-- date text size -->
+    <!-- sunshine logo offset -->
+    <dimen name="logo_x_offset">40dp</dimen>
+    <dimen name="logo_x_offset_round">60dp</dimen>
+    <dimen name="logo_y_offset">0dp</dimen>
+    <dimen name="logo_y_offset_round">10dp</dimen>
+
+    <!-- date text size and offset -->
     <dimen name="date_text_size">12dp</dimen>
     <dimen name="date_text_size_round">15dp</dimen>
     <dimen name="date_y_offset">90dp</dimen>
+    <dimen name="date_y_offset_round">100dp</dimen>
     <dimen name="date_x_offset">50dp</dimen>
+    <dimen name="date_x_offset_round">60dp</dimen>
 
     <!-- weather icon offset -->
     <dimen name="weather_y_offset">95dp</dimen>
+    <dimen name="weather_y_offset_round">110dp</dimen>
     <dimen name="weather_x_offset">45dp</dimen>
+    <dimen name="weather_x_offset_round">65dp</dimen>
 
     <!-- weather information text size -->
     <dimen name="weather_text_size">20dp</dimen>
-    <dimen name="weather_text_size_round">25dp</dimen>
+    <dimen name="weather_text_size_round">20dp</dimen>
 
     <!-- weather information offset -->
     <dimen name="high_temp_y_offset">115dp</dimen>
+    <dimen name="high_temp_y_offset_round">125dp</dimen>
     <dimen name="high_temp_x_offset">95dp</dimen>
-    <dimen name="high_temp_x_offset_round">100dp</dimen>
+    <dimen name="high_temp_x_offset_round">115dp</dimen>
     <dimen name="low_temp_y_offset">135dp</dimen>
+    <dimen name="low_temp_y_offset_round">145dp</dimen>
     <dimen name="low_temp_x_offset">95dp</dimen>
-    <dimen name="low_temp_x_offset_round">100dp</dimen>
+    <dimen name="low_temp_x_offset_round">115dp</dimen>
 
 </resources>
