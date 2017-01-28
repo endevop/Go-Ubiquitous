@@ -28,6 +28,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
         <!-- The manifest entry for our MainActivity. Each Activity requires a manifest entry -->
         <activity
             android:name=".MainActivity"
@@ -72,6 +76,15 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+
+        <!-- This service sends forecast data to the wearable -->
+        <service android:name=".sync.SunshineWearableListenerService"
+            android:exported="true" android:enabled="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data android:scheme="wear" android:host="*" android:pathPrefix="/forecast" />
             </intent-filter>
         </service>
     </application>
