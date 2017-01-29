@@ -59,11 +59,6 @@ import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.android.sunshine.SunshineWatchFaceUtil.FORECAST_PATH;
-import static com.example.android.sunshine.SunshineWatchFaceUtil.HIGH_TEMP_KEY;
-import static com.example.android.sunshine.SunshineWatchFaceUtil.LOW_TEMP_KEY;
-import static com.example.android.sunshine.SunshineWatchFaceUtil.WEATHER_ID_KEY;
-
 /**
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
@@ -71,9 +66,18 @@ import static com.example.android.sunshine.SunshineWatchFaceUtil.WEATHER_ID_KEY;
 public class SunshineWatchFaceService extends CanvasWatchFaceService {
     private static final String TAG = "Sunshine";
 
-    private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
-    private static final Typeface MONOSPACE_TYPEFACE = Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL);
+    private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF,
+            Typeface.NORMAL);
+    private static final Typeface MONOSPACE_TYPEFACE = Typeface.create(Typeface.MONOSPACE,
+            Typeface.NORMAL);
 
+    // DataMap
+    private static final String FORECAST_PATH   = "/forecast";
+    private static final String MAX_TEMP_KEY    = "max_temp";
+    private static final String MIN_TEMP_KEY    = "min_temp";
+    private static final String WEATHER_ID_KEY  = "weather_id";
+    private static final String HUMIDITY_KEY    = "humidity";
+    private static final String WIND_KEY        = "wind_speed_and_direction";
 
     /**
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
@@ -124,7 +128,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         Paint mTextDatePaint;
         Paint mTextDateWhitePaint;
         Paint mGrayPaint;
-        Paint mSeparatorPaint;
+
         Bitmap mSunshineLogoBitmap;
         Bitmap mWeatherIconBitmap;
         boolean mAmbient;
@@ -149,8 +153,10 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         float mYOffsetHighTemp;
         float mYOffsetLowTemp;
 
+        // default forecast values
         String mHighTemp = "--\u00B0";
         String mLowTemp = "--\u00B0";
+        String mHumidityAndWind = getString(R.string.humidity_and_wind_not_available);
         int mWeatherIcon = R.drawable.ic_clear;
 
         /**
@@ -199,9 +205,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             mTextDateWhitePaint = createTextPaint(resources.getColor(R.color.digital_text),
                     MONOSPACE_TYPEFACE);
 
-            mSeparatorPaint = new Paint();
-            mSeparatorPaint.setColor(resources.getColor(R.color.sunshine_primary_light));
-
             mSunshineLogoBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_logo);
             mWeatherIconBitmap = BitmapFactory.decodeResource(getResources(), mWeatherIcon);
 
@@ -234,9 +237,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             super.onVisibilityChanged(visible);
 
             if (visible) {
-
-                Log.d(TAG, "Visibility changed... connecting Google API");
-
                 mGoogleApiClient.connect();
 
                 registerReceiver();
@@ -246,8 +246,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 invalidate();
             } else {
                 unregisterReceiver();
-
-                Log.d(TAG, "Visibility changed... disconnecting Google API");
 
                 if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
                     Wearable.DataApi.removeListener(mGoogleApiClient, this);
@@ -375,9 +373,9 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                     // The user has started a different gesture or otherwise cancelled the tap.
                     break;
                 case TAP_TYPE_TAP:
-                    // The user has completed the tap gesture.
+                    // The user can request to see additional weather information
                     new RequestForecastTask().execute();
-                    Toast.makeText(getApplicationContext(), "Requested forecast update", Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplicationContext(), mHumidityAndWind, Toast.LENGTH_SHORT)
                             .show();
                     break;
             }
@@ -415,12 +413,8 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 canvas.drawText(dateText.toUpperCase(), mXOffsetDate, mYOffsetDate, mTextDatePaint);
             }
 
-
             // add Sunshine logo
             canvas.drawBitmap(mSunshineLogoBitmap, mXOffsetLogo, mYOffsetLogo, null);
-
-            // add separator
-            //canvas.drawLine(mXOffset, mYOffset + 5, bounds.width() - mXOffset, mYOffset + 5, mSeparatorPaint);
 
             // add weather icon
             if (isInAmbientMode()) {
@@ -431,7 +425,6 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
             // add weather information
             canvas.drawText(mHighTemp, mXOffsetHighTemp, mYOffsetHighTemp, mTextHighTempPaint);
             canvas.drawText(mLowTemp, mXOffsetLowTemp, mYOffsetLowTemp, mTextLowTempPaint);
-
         }
 
         /**
@@ -468,11 +461,8 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onConnected(Bundle connectionHint) {
-
-            Log.d(TAG, "onConnected: " + connectionHint);
-
             Wearable.DataApi.addListener(mGoogleApiClient, this);
-
+            // request forecast data
             new RequestForecastTask().execute();
         }
 
@@ -486,13 +476,12 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         @Override
         public void onConnectionFailed(ConnectionResult result) {
 
-            Log.d(TAG, "Failed to connect, with result: " + result);
+            Log.e(TAG, "Failed to connect, with result: " + result);
 
         }
 
         @Override
         public void onDataChanged(DataEventBuffer dataEvents) {
-            Log.d(TAG, "data events: " + dataEvents);
 
             for (DataEvent event : dataEvents) {
                 if (event.getType() == DataEvent.TYPE_CHANGED) {
@@ -501,16 +490,32 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                         DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                         DataMap dm = dataMapItem.getDataMap();
 
-                        if(dm.containsKey(HIGH_TEMP_KEY))
-                            mHighTemp = dm.getString(HIGH_TEMP_KEY);
+                        if(dm != null) {
+                            // high temp
+                            if (dm.containsKey(MAX_TEMP_KEY))
+                                mHighTemp = dm.getString(MAX_TEMP_KEY);
 
-                        if(dm.containsKey(LOW_TEMP_KEY))
-                            mLowTemp = dm.getString(LOW_TEMP_KEY);
+                            // low temp
+                            if (dm.containsKey(MIN_TEMP_KEY))
+                                mLowTemp = dm.getString(MIN_TEMP_KEY);
 
-                        if(dm.containsKey(WEATHER_ID_KEY))
-                            mWeatherIcon = dm.getInt(WEATHER_ID_KEY);
+                            // weather icon
+                            if (dm.containsKey(WEATHER_ID_KEY)) {
+                                mWeatherIcon = getIconForWeatherCondition(dm.getInt(WEATHER_ID_KEY));
+                                mWeatherIconBitmap = BitmapFactory.decodeResource(getResources(),
+                                        mWeatherIcon);
+                            }
 
-                        invalidate();
+                            // humidity and wind
+                            if (dm.containsKey(HUMIDITY_KEY) && dm.containsKey(WIND_KEY)) {
+                                int formatString = R.string.humidity_and_wind_toast;
+                                mHumidityAndWind = String.format(getString(formatString),
+                                        dm.getString(HUMIDITY_KEY),
+                                        dm.getString(WIND_KEY));
+                            }
+
+                            invalidate();
+                        }
                     }
                 }
             }
@@ -522,19 +527,58 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 NodeApi.GetConnectedNodesResult nodes =
                         Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
                 for (Node node : nodes.getNodes()) {
-                    Log.d(TAG, "node id: " + node.getId());
                     String myMsg = "Send me the forecast please " + System.currentTimeMillis();
                     MessageApi.SendMessageResult result =
                             Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
-                                    SunshineWatchFaceUtil.FORECAST_PATH, myMsg.getBytes()).await();
+                                    FORECAST_PATH, myMsg.getBytes()).await();
+                    if(!result.getStatus().isSuccess()) {
+                        Log.e(TAG, "Forecast request message failed");
+                    }
 
-                    Log.d(TAG, "sending result is success: " + result.getStatus().isSuccess() +
-                            " message: " + myMsg);
                 }
 
                 return null;
             }
         }
 
+        // this was copied from the Sunshine app
+        private int getIconForWeatherCondition(int weatherId) {
+
+        /*
+         * Based on weather code data for Open Weather Map.
+         */
+            if (weatherId >= 200 && weatherId <= 232) {
+                return R.drawable.ic_storm;
+            } else if (weatherId >= 300 && weatherId <= 321) {
+                return R.drawable.ic_light_rain;
+            } else if (weatherId >= 500 && weatherId <= 504) {
+                return R.drawable.ic_rain;
+            } else if (weatherId == 511) {
+                return R.drawable.ic_snow;
+            } else if (weatherId >= 520 && weatherId <= 531) {
+                return R.drawable.ic_rain;
+            } else if (weatherId >= 600 && weatherId <= 622) {
+                return R.drawable.ic_snow;
+            } else if (weatherId >= 701 && weatherId <= 761) {
+                return R.drawable.ic_fog;
+            } else if (weatherId == 761 || weatherId == 771 || weatherId == 781) {
+                return R.drawable.ic_storm;
+            } else if (weatherId == 800) {
+                return R.drawable.ic_clear;
+            } else if (weatherId == 801) {
+                return R.drawable.ic_light_clouds;
+            } else if (weatherId >= 802 && weatherId <= 804) {
+                return R.drawable.ic_cloudy;
+            } else if (weatherId >= 900 && weatherId <= 906) {
+                return R.drawable.ic_storm;
+            } else if (weatherId >= 958 && weatherId <= 962) {
+                return R.drawable.ic_storm;
+            } else if (weatherId >= 951 && weatherId <= 957) {
+                return R.drawable.ic_clear;
+            }
+
+            Log.e(TAG, "Unknown Weather: " + weatherId);
+            return R.drawable.ic_storm;
+        }
     }
 }
