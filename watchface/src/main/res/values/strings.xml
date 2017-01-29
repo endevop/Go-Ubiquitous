@@ -6,7 +6,7 @@
     <!-- This string is displayed on tap. It contains humidity and wind speed and direction
     values -->
     <string name="humidity_and_wind_toast">
-        Humidity: <xliff:g id="humidity">%1$s</xliff:g>%, Wind: <xliff:g id="wind">%2$s</xliff:g>
+        Humidity: <xliff:g id="humidity">%1$s</xliff:g>%%, Wind: <xliff:g id="wind">%2$s</xliff:g>
     </string>
     <!-- This string is default that is displayed on tap when forecast data is not available -->
     <string name="humidity_and_wind_not_available">

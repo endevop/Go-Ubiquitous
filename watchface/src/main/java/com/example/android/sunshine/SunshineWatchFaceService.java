@@ -375,7 +375,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 case TAP_TYPE_TAP:
                     // The user can request to see additional weather information
                     new RequestForecastTask().execute();
-                    Toast.makeText(getApplicationContext(), mHumidityAndWind, Toast.LENGTH_SHORT)
+                    Toast.makeText(getApplicationContext(), mHumidityAndWind, Toast.LENGTH_LONG)
                             .show();
                     break;
             }
@@ -527,7 +527,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 NodeApi.GetConnectedNodesResult nodes =
                         Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
                 for (Node node : nodes.getNodes()) {
-                    String myMsg = "Send me the forecast please " + System.currentTimeMillis();
+                    String myMsg = "today's forecast please: " + System.currentTimeMillis();
                     MessageApi.SendMessageResult result =
                             Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
                                     FORECAST_PATH, myMsg.getBytes()).await();

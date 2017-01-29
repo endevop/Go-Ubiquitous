@@ -28,6 +28,9 @@ public class SunshineWearableListenerService extends WearableListenerService
 
     private static final String TAG = "Sunshine";
 
+    private Uri mTodaysForecastUri = WeatherContract.WeatherEntry
+            .buildWeatherUriWithDate(SunshineDateUtils.normalizeDate(System.currentTimeMillis()));
+
     // DataMap
     private static final String FORECAST_PATH   = "/forecast";
     private static final String MAX_TEMP_KEY    = "max_temp";
@@ -59,7 +62,6 @@ public class SunshineWearableListenerService extends WearableListenerService
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "Wearable service created");
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -132,13 +134,9 @@ public class SunshineWearableListenerService extends WearableListenerService
 
     private PutDataMapRequest loadTodaysForecast() {
         PutDataMapRequest dataMap = PutDataMapRequest.create(FORECAST_PATH);
-
-        long dateInMilliseconds = System.currentTimeMillis();
-        Uri todaysWeatherUri = WeatherContract.WeatherEntry
-                .buildWeatherUriWithDate(SunshineDateUtils.normalizeDate(dateInMilliseconds));
-
+        dataMap.setUrgent();
         Cursor todaysWeatherCursor = getApplicationContext().getContentResolver().query(
-                todaysWeatherUri,
+                mTodaysForecastUri,
                 FORECAST_PROJECTION,
                 null,
                 null,
