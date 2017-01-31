@@ -25,7 +25,7 @@
     <dimen name="weather_y_offset">95dp</dimen>
     <dimen name="weather_y_offset_round">110dp</dimen>
     <dimen name="weather_x_offset">45dp</dimen>
-    <dimen name="weather_x_offset_round">65dp</dimen>
+    <dimen name="weather_x_offset_round">60dp</dimen>
 
     <!-- weather information text size -->
     <dimen name="weather_text_size">20dp</dimen>
@@ -35,10 +35,10 @@
     <dimen name="high_temp_y_offset">115dp</dimen>
     <dimen name="high_temp_y_offset_round">125dp</dimen>
     <dimen name="high_temp_x_offset">95dp</dimen>
-    <dimen name="high_temp_x_offset_round">115dp</dimen>
+    <dimen name="high_temp_x_offset_round">110dp</dimen>
     <dimen name="low_temp_y_offset">135dp</dimen>
     <dimen name="low_temp_y_offset_round">145dp</dimen>
     <dimen name="low_temp_x_offset">95dp</dimen>
-    <dimen name="low_temp_x_offset_round">115dp</dimen>
+    <dimen name="low_temp_x_offset_round">110dp</dimen>
 
 </resources>

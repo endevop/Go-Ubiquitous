@@ -527,14 +527,13 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                 NodeApi.GetConnectedNodesResult nodes =
                         Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).await();
                 for (Node node : nodes.getNodes()) {
-                    String myMsg = "today's forecast please: " + System.currentTimeMillis();
+                    String msg = "date: " + System.currentTimeMillis();
                     MessageApi.SendMessageResult result =
                             Wearable.MessageApi.sendMessage(mGoogleApiClient, node.getId(),
-                                    FORECAST_PATH, myMsg.getBytes()).await();
+                                    FORECAST_PATH, msg.getBytes()).await();
                     if(!result.getStatus().isSuccess()) {
                         Log.e(TAG, "Forecast request message failed");
                     }
-
                 }
 
                 return null;

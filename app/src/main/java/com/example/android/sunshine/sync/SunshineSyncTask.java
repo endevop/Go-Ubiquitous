@@ -104,6 +104,9 @@ public class SunshineSyncTask {
                     NotificationUtils.notifyUserOfNewWeather(context);
                 }
 
+                /* Send updated forecast data to wearable device */
+                new SunshineWearableSyncTask(context).execute();
+
             /* If the code reaches this point, we have successfully performed our sync */
 
             }
