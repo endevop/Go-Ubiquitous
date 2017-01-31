@@ -64,7 +64,7 @@ import java.util.concurrent.TimeUnit;
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
 public class SunshineWatchFaceService extends CanvasWatchFaceService {
-    private static final String TAG = "Sunshine";
+    private static final String TAG = "SunshineWatchFace";
 
     private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF,
             Typeface.NORMAL);
@@ -153,7 +153,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         float mYOffsetHighTemp;
         float mYOffsetLowTemp;
 
-        // default forecast values
+        // default forecast place holders
         String mHighTemp = "--\u00B0";
         String mLowTemp = "--\u00B0";
         String mHumidityAndWind = getString(R.string.humidity_and_wind_not_available);
@@ -374,6 +374,7 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
                     break;
                 case TAP_TYPE_TAP:
                     // The user can request to see additional weather information
+                    // Humidity and wind speed direction
                     new RequestForecastTask().execute();
                     Toast.makeText(getApplicationContext(), mHumidityAndWind, Toast.LENGTH_LONG)
                             .show();
@@ -462,7 +463,10 @@ public class SunshineWatchFaceService extends CanvasWatchFaceService {
         @Override
         public void onConnected(Bundle connectionHint) {
             Wearable.DataApi.addListener(mGoogleApiClient, this);
-            // request forecast data
+            /* We request forecast data on connect. This ensures that we always have the
+             * freshest data available.
+             * Changes in location and units are handled by the mobile device.
+             */
             new RequestForecastTask().execute();
         }
 
